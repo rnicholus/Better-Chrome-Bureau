@@ -1,0 +1,7 @@
+Chrome extension for BBB.org.  This will display, on the extension badge, the BBB rating for the company associated with the website the user is currently browsing.  
+
+v1: Domain will be used to lookup the business and report the rating and if the business is BBB accredited.  Clicking the extension badge will result in a popup containing the business' rating page.
+
+v2: Add lookups for companies without a domain, such as those that appear in Yahoo Local, Google Maps/Businesses, and Yelp.
+
+v3: Allow users to highlight a business name or domain and right-click to receive rating info.

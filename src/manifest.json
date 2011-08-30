@@ -1,0 +1,18 @@
+{
+  "name": "practice extension",
+  "version": "1.0",
+  "description": "The first extension that I made.",
+  "browser_action": {
+    "default_icon": "icon.png"
+  },
+  "background_page": "main.html",
+  "permissions": [
+    "notifications",
+    "http://*/",
+    "tabs"
+  ],
+  "browser_action": {
+    "default_icon": "icon.png",
+    "popup": "popup.html"
+  }
+}
