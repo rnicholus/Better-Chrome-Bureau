@@ -1,6 +1,7 @@
 var BCB = BCB || {};
 
 BCB.Whoisparser = function() {
+	var blockedResultMessage = "Too many requests!";
 	var whoisUrl = "http://allwhois.com/";
 	var commonWhoisDataPattern = /.*Registrant:\n(.*)\n(.*)\n.*/;
 	var organisationNamePattern = /.*Organisation Name\.+\s*(.+)\n.*/;
@@ -26,8 +27,16 @@ BCB.Whoisparser = function() {
 		getCompanyName : function(domainStr, callback) {
 			$.post(whoisUrl, {dn: domainStr}, function(responseData) {
 					var searchResponseText = $(responseData).find("textarea[name=areafield]").text();
-					var companyName = extractCompanyName(searchResponseText);
-					callback(companyName);
+					if (searchResponseText != blockedResultMessage)
+					{
+						var companyName = extractCompanyName(searchResponseText);
+						callback(companyName);
+					}
+					else
+					{
+						console.log('retrying...');
+						BCB.Whoisparser.getCompanyName(domainStr, callback);
+					}
 			});
 		}
 	};
