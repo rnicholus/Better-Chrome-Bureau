@@ -25,6 +25,13 @@ BCB.Ratings = function()
 			.replace(/[.!]/g, '');
 	}
 	
+	function updateTitleAsWaiting(domainStr)
+	{
+		chrome.browserAction.setTitle({
+			title:"looking up rating for " + domainStr
+		});
+	}
+	
 	function displayRating(companyName, callback)
 	{
 		var formattedCompanyName = formatCompanyNameForSearch(companyName);
@@ -54,7 +61,10 @@ BCB.Ratings = function()
 				chrome.browserAction.setBadgeText({
 					text:rating
 				});
-				console.log(companyName + ": " + rating);				
+				chrome.browserAction.setTitle({
+					title:companyName
+				});
+				console.log(formattedCompanyName + ": " + rating);				
 			});
 		});		
 	}
@@ -70,6 +80,8 @@ BCB.Ratings = function()
 					{
 						console.log("new tab w/ new domain: " + domainStr);
 						lastDomainStr = domainStr;
+						
+						updateTitleAsWaiting(domainStr)
 						BCB.Whoisparser.getCompanyName(domainStr, function(companyName) {
 							displayRating(companyName)
 						});
@@ -86,6 +98,8 @@ BCB.Ratings = function()
 				{
 					console.log('new domain: ' + domainStr);
 					lastDomainStr = domainStr;
+
+					updateTitleAsWaiting(domainStr)
 					BCB.Whoisparser.getCompanyName(domainStr, function(companyName) {
 						displayRating(companyName)
 					});
