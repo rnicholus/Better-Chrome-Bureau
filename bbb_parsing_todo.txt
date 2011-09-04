@@ -1,1 +1,2 @@
 - account for shitty BBB search engine: perhaps shave a word off of the company name then re-search until a match is found
+- some way to override names listed in whois registrant for domains

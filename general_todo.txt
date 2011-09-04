@@ -1,0 +1,2 @@
+- cache domains/ratings for all open tabs
+- maybe cache domains/ratings independent of tabs up to a certain #

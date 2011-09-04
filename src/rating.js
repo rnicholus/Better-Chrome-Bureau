@@ -34,39 +34,51 @@ BCB.Ratings = function()
 	
 	function displayRating(companyName, callback)
 	{
-		var formattedCompanyName = formatCompanyNameForSearch(companyName);
+		if (companyName)
+		{
+			var formattedCompanyName = formatCompanyNameForSearch(companyName);
 
-		$('#result').load('http://wisconsin.bbb.org/Find-Business-Reviews/name/' + formattedCompanyName + '/ tr.result-row', function(data) {
-			var link = $('#result').find('.biz-accred-status').find('a').attr('href') + ' #accedited-rating';
-			$('#result').load(link, function() {
-				var title = $('#result').find('img').attr('alt');
-				var myRegexp = /.*\s([ABCDF][-+]?)\s*.*/;
-				var match = myRegexp.exec(title);
-				if (match)
-				{
-					var rating = match[1];
-				}
-				else
-				{
-					match = /.*(NR) Rating.*/.exec(title);
+			$('#result').load('http://wisconsin.bbb.org/Find-Business-Reviews/name/' + formattedCompanyName + '/ tr.result-row', function(data) {
+				var link = $('#result').find('.biz-accred-status').find('a').attr('href') + ' #accedited-rating';
+				$('#result').load(link, function() {
+					var title = $('#result').find('img').attr('alt');
+					var myRegexp = /.*\s([ABCDF][-+]?)\s*.*/;
+					var match = myRegexp.exec(title);
 					if (match)
 					{
-						rating = match[1];
+						var rating = match[1];
 					}
 					else
 					{
-						rating = '?';
+						match = /.*(NR) Rating.*/.exec(title);
+						if (match)
+						{
+							rating = match[1];
+						}
+						else
+						{
+							rating = '?';
+						}
 					}
-				}
-				chrome.browserAction.setBadgeText({
-					text:rating
+					chrome.browserAction.setBadgeText({
+						text:rating
+					});
+					chrome.browserAction.setTitle({
+						title:companyName
+					});
+					console.log(formattedCompanyName + ": " + rating);				
 				});
-				chrome.browserAction.setTitle({
-					title:companyName
-				});
-				console.log(formattedCompanyName + ": " + rating);				
+			});		
+		}
+		else
+		{
+			chrome.browserAction.setBadgeText({
+				text:'?'
 			});
-		});		
+			chrome.browserAction.setTitle({
+				title:'unknown company'
+			});
+		}
 	}
 
 	return {

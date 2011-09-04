@@ -14,7 +14,7 @@ BCB.Whoisparser = function() {
 		{
 			var secondLine = match[2];
 			if (secondLine.length == 0 || /\d+/.exec(secondLine)) {
-				companyName = match[1];
+				var companyName = match[1];
 			}
 			else
 			{
@@ -38,8 +38,11 @@ BCB.Whoisparser = function() {
 			}
 		}
 		
-		companyName = companyName.trim()
-			.replace(/\(.+\)/g, '');
+		if (companyName)
+		{
+			companyName = companyName.trim()
+				.replace(/\(.+\)/g, '');
+		}
 			
 		return companyName;
 		
