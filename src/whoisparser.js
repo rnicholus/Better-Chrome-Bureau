@@ -5,22 +5,44 @@ BCB.Whoisparser = function() {
 	var whoisUrl = "http://allwhois.com/";
 	var commonWhoisDataPattern = /.*Registrant:\n(.*)\n(.*)\n.*/;
 	var organisationNamePattern = /.*Organisation Name\.+\s*(.+)\n.*/;
+	var registrantOrganizationPattern = /Registrant Organization:(.+)/;
+	
 	
 	var extractCompanyName = function(searchResponseText) {
 		var match = commonWhoisDataPattern.exec(searchResponseText);
 		if (match)
 		{
-			var secondLine = match[2].trim();
+			var secondLine = match[2];
 			if (secondLine.length == 0 || /\d+/.exec(secondLine)) {
-				return match[1].trim();
+				companyName = match[1];
 			}
-			return secondLine;
+			else
+			{
+				companyName = secondLine;
+			}
 		}
-		match = organisationNamePattern.exec(searchResponseText);
-		if (match)
+		else
 		{
-			return match[1].trim();
+			match = organisationNamePattern.exec(searchResponseText);
+			if (match)
+			{
+				companyName = match[1];
+			}
+			else
+			{
+				match = registrantOrganizationPattern.exec(searchResponseText);
+				if (match)
+				{
+					companyName = match[1];
+				}
+			}
 		}
+		
+		companyName = companyName.trim()
+			.replace(/\(.+\)/g, '');
+			
+		return companyName;
+		
 	};
 	
 	return {

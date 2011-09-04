@@ -1,4 +1,1 @@
-- filter out anything enclosed in '(' ')'
-- Registrant Organization: 
-- find a way to ensure address lines are ignored or/and
-   make sure first line is checked first
+ 

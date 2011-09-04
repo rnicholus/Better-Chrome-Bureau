@@ -19,17 +19,13 @@ BCB.Ratings = function()
 		}
 	}
 
-	function getDomainAsSearchContext(domainStr)
-	{
-		return domainStr.replace('\.', '_');
-	}
-
 	function formatCompanyNameForSearch(companyName)
 	{
-		return companyName.replace(/\s/g, '+');
+		return companyName.replace(/\s/g, '+')
+			.replace(/[.!]/g, '');
 	}
 	
-	function getRating(companyName, callback)
+	function displayRating(companyName, callback)
 	{
 		var formattedCompanyName = formatCompanyNameForSearch(companyName);
 
@@ -39,11 +35,26 @@ BCB.Ratings = function()
 				var title = $('#result').find('img').attr('alt');
 				var myRegexp = /.*\s([ABCDF][-+]?)\s*.*/;
 				var match = myRegexp.exec(title);
-				var rating = match[1];
-//				chrome.browserAction.setBadgeText({
-//					text:rating
-//				});
-				console.log(companyName + ": " + rating);
+				if (match)
+				{
+					var rating = match[1];
+				}
+				else
+				{
+					match = /.*(NR) Rating.*/.exec(title);
+					if (match)
+					{
+						rating = match[1];
+					}
+					else
+					{
+						rating = '?';
+					}
+				}
+				chrome.browserAction.setBadgeText({
+					text:rating
+				});
+				console.log(companyName + ": " + rating);				
 			});
 		});		
 	}
@@ -58,8 +69,10 @@ BCB.Ratings = function()
 					if (domainStr && domainStr != lastDomainStr)
 					{
 						console.log("new tab w/ new domain: " + domainStr);
-						console.log(getDomainAsSearchContext(domainStr));
 						lastDomainStr = domainStr;
+						BCB.Whoisparser.getCompanyName(domainStr, function(companyName) {
+							displayRating(companyName)
+						});
 					}
 				});
 			}
@@ -72,15 +85,13 @@ BCB.Ratings = function()
 				if (domainStr && domainStr != lastDomainStr)
 				{
 					console.log('new domain: ' + domainStr);
-					console.log(getDomainAsSearchContext(domainStr));
 					lastDomainStr = domainStr;
+					BCB.Whoisparser.getCompanyName(domainStr, function(companyName) {
+						displayRating(companyName)
+					});
 				}
 			}
 		},
-		
-		getCompanyRating : function(companyName) {
-			getRating(companyName);
-		}
 	};
 }();
 
