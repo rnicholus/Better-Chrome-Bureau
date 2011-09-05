@@ -17,7 +17,8 @@ BCB.Ratings = function()
 	function addRatingToCache(domainStr, company, rating)
 	{
 		//TODO limit size of cache
-		cachedRatings[domainStr] = {comany: company, rating: rating};
+		cachedRatings[domainStr] = {company: company, rating: rating};
+		updateRating(rating, company);
 	}
 	
 	function getRatingFromCache(domainStr)
@@ -57,6 +58,7 @@ BCB.Ratings = function()
 		});
 	}
 	
+	
 	function processDomain(domainStr)
 	{
 		updateTitleAsWaiting(domainStr)
@@ -79,11 +81,13 @@ BCB.Ratings = function()
 		if (companyName)
 		{
 			var formattedCompanyName = formatCompanyNameForSearch(companyName);
-
-			$('#result').load('http://wisconsin.bbb.org/Find-Business-Reviews/name/' + formattedCompanyName + '/ tr.result-row', function(data) {
-				var link = $('#result').find('.biz-accred-status').find('a').attr('href') + ' #accedited-rating';
-				$('#result').load(link, function() {
-					var title = $('#result').find('img').attr('alt');
+			
+			var searchResultsPage = $("<div/>");
+			$(searchResultsPage).load('http://wisconsin.bbb.org/Find-Business-Reviews/name/' + formattedCompanyName + '/ tr.result-row', function(data) {
+				var link = $(searchResultsPage).find('.biz-accred-status').find('a').attr('href') + ' #accedited-rating';
+				var ratingPage = $("<div/>");
+				$(ratingPage).load(link, function() {
+					var title = $(ratingPage).find('img').attr('alt');
 					var myRegexp = /.*\s([ABCDF][-+]?)\s*.*/;
 					var match = myRegexp.exec(title);
 					if (match)
@@ -102,8 +106,8 @@ BCB.Ratings = function()
 							rating = '?';
 						}
 					}
+					
 					addRatingToCache(domainStr, companyName, rating);
-					updateRating(rating, companyName);
 					console.log(formattedCompanyName + ": " + rating);				
 				});
 			});		

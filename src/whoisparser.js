@@ -6,9 +6,10 @@ BCB.Whoisparser = function() {
 	var commonWhoisDataPattern = /.*Registrant:\n(.*)\n(.*)\n.*/;
 	var organisationNamePattern = /.*Organisation Name\.+\s*(.+)\n.*/;
 	var registrantOrganizationPattern = /Registrant Organization:(.+)/;
+	var registrarPattern = /Registrar:(.+)\n/;
 	
 	
-	var extractCompanyName = function(searchResponseText) {
+	function extractCompanyName (searchResponseText) {
 		var match = commonWhoisDataPattern.exec(searchResponseText);
 		if (match)
 		{

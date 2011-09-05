@@ -1,1 +1,2 @@
- 
+- integrate new registrar pattern
+- cleanup pattern matching logic 
