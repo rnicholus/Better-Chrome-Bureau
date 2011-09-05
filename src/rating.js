@@ -4,12 +4,27 @@ BCB.Ratings = function()
 {
 	var domainPattern = /http[s]?:\/\/(\w+\.)*(\w+\.\w+)/\/;
 	var lastDomainStr;
-
+	var cachedRatings = {};
+	var rating = {
+		company:undefined,
+		rating:undefined
+	}
 	var currentTab  =  {
 		id:undefined,
 		url:undefined
 	}
 
+	function addRatingToCache(domainStr, company, rating)
+	{
+		//TODO limit size of cache
+		cachedRatings[domainStr] = {comany: company, rating: rating};
+	}
+	
+	function getRatingFromCache(domainStr)
+	{
+		return cachedRatings[domainStr];
+	}
+	
 	function getDomain(urlStr)
 	{
 		var match = domainPattern.exec(urlStr);
@@ -32,7 +47,34 @@ BCB.Ratings = function()
 		});
 	}
 	
-	function displayRating(companyName, callback)
+	function updateRating(ratingStr, companyNameStr)
+	{
+		chrome.browserAction.setBadgeText({
+			text:ratingStr
+		});
+		chrome.browserAction.setTitle({
+			title:companyNameStr
+		});
+	}
+	
+	function processDomain(domainStr)
+	{
+		updateTitleAsWaiting(domainStr)
+		
+		var cachedRating = getRatingFromCache(domainStr);
+		if (cachedRating)
+		{
+			updateRating(cachedRating.rating, cachedRating.company);
+		}
+		else
+		{
+			BCB.Whoisparser.getCompanyName(domainStr, function(companyName) {
+				displayRating(domainStr, companyName)
+			});
+		}		
+	}
+	
+	function displayRating(domainStr, companyName, callback)
 	{
 		if (companyName)
 		{
@@ -60,35 +102,27 @@ BCB.Ratings = function()
 							rating = '?';
 						}
 					}
-					chrome.browserAction.setBadgeText({
-						text:rating
-					});
-					chrome.browserAction.setTitle({
-						title:companyName
-					});
+					addRatingToCache(domainStr, companyName, rating);
+					updateRating(rating, companyName);
 					console.log(formattedCompanyName + ": " + rating);				
 				});
 			});		
 		}
 		else
 		{
-			chrome.browserAction.setBadgeText({
-				text:'?'
-			});
-			chrome.browserAction.setTitle({
-				title:'unknown company'
-			});
+			updateRating('?', "unknown company");
 		}
 	}
-
+	
 	return {
-		tabSelectionChangedListener : function (tabId, selectInfo) {
+		tabSelectionChangedListener : function(tabId, selectInfo) {
 			if (tabId != currentTab.id)
 			{
 				currentTab.id = tabId;
 				chrome.tabs.get(currentTab.id, function (tab) {
 					var domainStr = getDomain(tab.url);
-					if (domainStr && domainStr != lastDomainStr)
+					processDomain(domainStr);
+	/*				if (domainStr && domainStr != lastDomainStr)
 					{
 						console.log("new tab w/ new domain: " + domainStr);
 						lastDomainStr = domainStr;
@@ -98,7 +132,7 @@ BCB.Ratings = function()
 							displayRating(companyName)
 						});
 					}
-				});
+	*/			});
 			}
 		},
 		
@@ -106,7 +140,8 @@ BCB.Ratings = function()
 			if (tabId == currentTab.id && changeInfo.status == 'loading') {
 				currentTab.url = changeInfo.url;
 				var domainStr = getDomain(currentTab.url);
-				if (domainStr && domainStr != lastDomainStr)
+				processDomain(domainStr);
+	/*			if (domainStr && domainStr != lastDomainStr)
 				{
 					console.log('new domain: ' + domainStr);
 					lastDomainStr = domainStr;
@@ -116,14 +151,13 @@ BCB.Ratings = function()
 						displayRating(companyName)
 					});
 				}
-			}
-		},
-	};
+	*/		}
+		}
+	}
+	
 }();
 
 
 chrome.tabs.onSelectionChanged.addListener(BCB.Ratings.tabSelectionChangedListener);
 
 chrome.tabs.onUpdated.addListener(BCB.Ratings.tabUpdatedListener);
-		
-
