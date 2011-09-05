@@ -122,17 +122,7 @@ BCB.Ratings = function()
 				chrome.tabs.get(currentTab.id, function (tab) {
 					var domainStr = getDomain(tab.url);
 					processDomain(domainStr);
-	/*				if (domainStr && domainStr != lastDomainStr)
-					{
-						console.log("new tab w/ new domain: " + domainStr);
-						lastDomainStr = domainStr;
-						
-						updateTitleAsWaiting(domainStr)
-						BCB.Whoisparser.getCompanyName(domainStr, function(companyName) {
-							displayRating(companyName)
-						});
-					}
-	*/			});
+				});
 			}
 		},
 		
@@ -141,17 +131,7 @@ BCB.Ratings = function()
 				currentTab.url = changeInfo.url;
 				var domainStr = getDomain(currentTab.url);
 				processDomain(domainStr);
-	/*			if (domainStr && domainStr != lastDomainStr)
-				{
-					console.log('new domain: ' + domainStr);
-					lastDomainStr = domainStr;
-
-					updateTitleAsWaiting(domainStr)
-					BCB.Whoisparser.getCompanyName(domainStr, function(companyName) {
-						displayRating(companyName)
-					});
-				}
-	*/		}
+			}
 		}
 	}
 	
