@@ -3,24 +3,25 @@ var BCB = BCB || {};
 BCB.Whoisparser = function() {
 	var blockedResultMessage = "Too many requests!";
 	var whoisUrl = "http://allwhois.com/";
-	var commonWhoisDataPattern = /.*Registrant:\n(.*)\n(.*)\n.*/;
+	//var commonWhoisDataPattern = /.*Registrant:\n(.*)\n(.*)\n.*/;
+	var commonWhoisPattern = /.*Registrant:\n(.*)\n(.+)\n/;
+	var commonWhoisPatternNoAddressSecondLine = /.*Registrant:\n(.*)\n(\D+?)\n/;
+	var commonWhoisPatternFirstLine = /.*Registrant:\n(.*)\n/;
 	var organisationNamePattern = /.*Organisation Name\.+\s*(.+)\n.*/;
 	var registrantOrganizationPattern = /Registrant Organization:(.+)/;
 	var registrarPattern = /Registrar:(.+)\n/;
 	
 	
 	function extractCompanyName (searchResponseText) {
-		var match = commonWhoisDataPattern.exec(searchResponseText);
-		if (match)
+		var match;
+		
+		if (match = commonWhoisPatternNoAddressSecondLine.exec(searchResponseText) && commonWhoisPattern.exec(searchResponseText))
 		{
-			var secondLine = match[2];
-			if (secondLine.length == 0 || /\d+/.exec(secondLine)) {
-				var companyName = match[1];
-			}
-			else
-			{
-				companyName = secondLine;
-			}
+			companyName = match[2];
+		}
+		else if (match = commonWhoisPatternFirstLine.exec(searchResponseText))
+		{
+			companyName = match[1];
 		}
 		else
 		{
