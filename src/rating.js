@@ -1,5 +1,6 @@
 var BCB = BCB || {};
 
+
 BCB.Ratings = function()
 {
 	var domainPattern = /http[s]?:\/\/(\w+\.)*(\w+\.\w+)/\/;
